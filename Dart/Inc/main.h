@@ -28,29 +28,34 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
+/* Library */
+#include <stm32f4xx_hal.h>
+#include <stm32f4xx.h>
+#include <string.h>
+#include <stdint.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+//#include "arm_math.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+/* MyLibs */
+#include "can.h"
+#include "dma.h"
+#include "i2c.h"
+#include "spi.h"
+#include "tim.h"
+#include "usart.h"
+#include "gpio.h"
 
-/* USER CODE END Includes */
+#include "Charge_Controller.h"
+#include "Rotate_Controller.h"
+#include "Replace_Controller.h"
 
-/* Exported types ------------------------------------------------------------*/
-/* USER CODE BEGIN ET */
-
-/* USER CODE END ET */
-
-/* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
-
-/* USER CODE END EC */
-
-/* Exported macro ------------------------------------------------------------*/
-/* USER CODE BEGIN EM */
-
-/* USER CODE END EM */
-
-/* Exported functions prototypes ---------------------------------------------*/
+/* Tasks */
+#include "Start_Task.h"
+#include "controller_Task.h"
+	
+	
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
@@ -81,9 +86,6 @@ void Error_Handler(void);
 #define CS1_GYRO_Pin GPIO_PIN_0
 #define CS1_GYRO_GPIO_Port GPIOB
 
-/* USER CODE BEGIN Private defines */
-
-/* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }

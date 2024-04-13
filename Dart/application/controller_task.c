@@ -29,16 +29,14 @@ extern rmotor_control_t MotorsController;
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
+ 
 void Controller_task(void const * argument)
 {
 		motors_PID_Filter_init();
 		MotorController_combine();
     while(1)
     {
-				charge_motors_control((charge_pid_control_t *)MotorsController.charge_motors_controller, (MotorsController.rc_ctrl->rc.ch1 * 0.001) );
-				
-				
-				
+		motors_Controller();		
         osDelay(4);//250HZ
     }
 }

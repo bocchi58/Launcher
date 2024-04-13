@@ -10,7 +10,7 @@
       <TargetName>launcher</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060960::V5.06 update 7 (build 960)::.\ARMCC</pCCUsed>
+      <pCCUsed>5050106::V5.05 update 1 (build 106)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407IGHx</Device>
@@ -735,6 +735,16 @@
           <GroupName>application</GroupName>
           <Files>
             <File>
+              <FileName>Start_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\application\Start_Task.c</FilePath>
+            </File>
+            <File>
+              <FileName>controller_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\application\controller_task.c</FilePath>
+            </File>
+            <File>
               <FileName>INS_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\application\INS_task.c</FilePath>
@@ -748,11 +758,6 @@
               <FileName>test_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\application\test_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>controller_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\application\controller_task.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -783,6 +788,21 @@
               <FileName>RMotors_Controller.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\components\controller\RMotors_Controller.c</FilePath>
+            </File>
+            <File>
+              <FileName>Charge_Controller.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\components\controller\Charge_Controller.c</FilePath>
+            </File>
+            <File>
+              <FileName>Rotate_Controller.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\components\controller\Rotate_Controller.c</FilePath>
+            </File>
+            <File>
+              <FileName>Replace_Controller.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\components\controller\Replace_Controller.c</FilePath>
             </File>
           </Files>
         </Group>

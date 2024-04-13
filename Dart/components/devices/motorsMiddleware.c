@@ -5,9 +5,11 @@
 
 
 RMotor_t charge_motor_receive[2];// 0:左 1:右
+RMotor_t rotate_motor_receive;
+RMotor_t replace_motor_receive;
 
-
-/* @brief:motor canfilter init
+/**
+ * @brief:		motor canfilter init
  * @param[in]:
  * @param[out]:
  */
@@ -29,10 +31,16 @@ void motor_can_filter_init(CAN_HandleTypeDef* hcan_1)
 		HAL_CAN_ActivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY); 
 	
 }
-/* @brief:callback
+/**
+ * @brief:		can回调函数
  * @param[in]:
  * @param[out]:
  */
+static uint16_t replaceFirstPos;
+static uint8_t 	replaceFirstPosFLAG;//过零检测标志位
+static uint16_t rotateFirstPos;
+static uint8_t 	rotateFirstPosFLAG;//过零检测标志位
+
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
     CAN_RxHeaderTypeDef RxHeader;
@@ -48,24 +56,62 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 					case 0x201:
 						charge_motor_receive[0].angle_inst				= 	((float)((rx_data[0]<<8) | rx_data[1])) * ENCODE2ANGLE ;
 						charge_motor_receive[0].speed_inst				=   ((rx_data[2]<<8)| rx_data[3]);
-						charge_motor_receive[0].cur_temp          =    (rx_data[4]<<8) | rx_data[5];
+						charge_motor_receive[0].cur_temp          		=    (rx_data[4]<<8) | rx_data[5];
 						charge_motor_receive[0].current_inst			=    charge_motor_receive[0].cur_temp*CURRENT_DEVIED_100;
 					break;
 					
 					case 0x203:
 						charge_motor_receive[1].angle_inst				= 	((float)((rx_data[0]<<8) | rx_data[1])) * ENCODE2ANGLE ;
 						charge_motor_receive[1].speed_inst				=   ((rx_data[2]<<8)| rx_data[3]);
-						charge_motor_receive[1].cur_temp      		=    (rx_data[4]<<8) | rx_data[5];
+						charge_motor_receive[1].cur_temp      			=    (rx_data[4]<<8) | rx_data[5];
 						charge_motor_receive[1].current_inst			=    charge_motor_receive[1].cur_temp*CURRENT_DEVIED_100;					
 					break;
+					
+					case 0x205://旋转装置
+						rotate_motor_receive.angle_inst					=	((float)((rx_data[0]<<8) | rx_data[1])) * ENCODE2ANGLE ;
+						rotate_motor_receive.speed_inst					=	((rx_data[2]<<8)| rx_data[3]);
+						rotate_motor_receive.cur_temp					=	(rx_data[4]<<8) | rx_data[5];
+						rotate_motor_receive.current_inst				=	rotate_motor_receive.cur_temp*CURRENT_DEVIED_100;
+						rotate_motor_receive.real_speed = (float)rotate_motor_receive.speed_inst*9.549296585513720f;//rad/s
+						if( !rotateFirstPosFLAG ){
+							rotateFirstPos = rotate_motor_receive.angle_inst;
+							rotateFirstPosFLAG = 1;
+						}
+						if( (rotate_motor_receive.angle_inst - rotate_motor_receive.last_angle)<-0.7*ENCODE_MAX_2006 )//待修改
+							rotate_motor_receive.cycle_cnt++;
+						else if( (rotate_motor_receive.angle_inst - rotate_motor_receive.last_angle)>+0.7*ENCODE_MAX_2006 )
+							rotate_motor_receive.cycle_cnt--;
+							rotate_motor_receive.real_posion = (ENCODE_MAX_2006*rotate_motor_receive.cycle_cnt+rotate_motor_receive.angle_inst - rotateFirstPos)*2.1307889781398236807760844444984e-6f;//rad
+							rotate_motor_receive.last_angle = rotate_motor_receive.angle_inst;
+						
+				}
+			}else if(hcan -> Instance == CAN2)
+			{
+				switch (RxHeader.StdId){
+					case 0x201://丝杆
+						replace_motor_receive.angle_inst				=	((float)((rx_data[0]<<8) | rx_data[1])) * ENCODE2ANGLE ;
+						replace_motor_receive.speed_inst				=	((rx_data[2]<<8)| rx_data[3]);
+						replace_motor_receive.cur_temp					=	(rx_data[4]<<8) | rx_data[5];
+						replace_motor_receive.current_inst				=	rotate_motor_receive.cur_temp*CURRENT_DEVIED_100;
+						replace_motor_receive.real_speed = (float)replace_motor_receive.speed_inst*9.549296585513720f;//rad/s
+						if( !replaceFirstPosFLAG ){
+							replaceFirstPos = replace_motor_receive.angle_inst;
+							replaceFirstPosFLAG = 1;
+						}
+						if( (replace_motor_receive.angle_inst - replace_motor_receive.last_angle)<-0.7*ENCODE_MAX_2006 )
+							replace_motor_receive.cycle_cnt++;
+						else if( (replace_motor_receive.angle_inst - replace_motor_receive.last_angle)>+0.7*ENCODE_MAX_2006 )
+							replace_motor_receive.cycle_cnt--;
+							replace_motor_receive.real_posion = (ENCODE_MAX_2006*replace_motor_receive.cycle_cnt+replace_motor_receive.angle_inst - replaceFirstPos)*2.1307889781398236807760844444984e-6f;//rad
+							replace_motor_receive.last_angle = replace_motor_receive.angle_inst;
 				}
 			}
-			
     }	
 }
-/* @brief:motors can send 
-* @param[in]: 3508 ID:200 201~204 ID:1FF 205~208
-							6020 ID:1FF 201~204 ID:2FF 205~207
+/**
+ * @brief:		motors can send 
+ * @param[in]: 	3508 ID:200 201~204 ID:1FF 205~208
+ *				6020 ID:1FF 201~204 ID:2FF 205~207
  * @param[out]:
  */
 void _Motor_ID_Cansend(int a, int b, int c, int d,int ID,CAN_HandleTypeDef *hcan)
@@ -82,6 +128,7 @@ void _Motor_ID_Cansend(int a, int b, int c, int d,int ID,CAN_HandleTypeDef *hcan
 		TxHeader.StdId = ID;  // 标准ID
 	//TxHeader.ExtId = 0x01;   // 扩展ID，如果使用
 	
+	//限幅
     a = LIMIT_MAX_MIN(a, 15000, -15000);
     b = LIMIT_MAX_MIN(b, 15000, -15000);
     c = LIMIT_MAX_MIN(c, 15000, -15000);

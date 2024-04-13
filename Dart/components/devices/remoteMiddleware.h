@@ -4,6 +4,7 @@
 
 #include "struct_typedef.h"
 
+#define RX_USART_BUFFER 18U
 
 /*遥控器结构体*/
 typedef __packed struct
@@ -15,6 +16,7 @@ typedef __packed struct
 		unsigned short s1;
 		unsigned short s2;
 }Remote;
+
 /*鼠标结构体*/
 typedef __packed 	struct
 {
@@ -24,11 +26,13 @@ typedef __packed 	struct
 		unsigned char press_l;
 		unsigned char press_r;
 }Mouse;
+
 /*键盘结构体*/
 typedef __packed struct
 {
 		unsigned short w,s,a,d,q,e,r,f,g,z,x,c,v,b,shift,ctrl;
 }Key;
+
 /*遥键鼠结构体综合*/
 typedef __packed struct
 {

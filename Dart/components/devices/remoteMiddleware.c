@@ -1,11 +1,16 @@
+/**
+ ******************************************************************************
+ * @file    remoteMiddleware.c
+ * @brief   远程控制
+ ******************************************************************************
+ * @attention
+ ******************************************************************************
+ */
 #include "main.h"
-#include "usart.h"
 #include "stm32f4xx_hal_uart.h"
 
 #include "remoteMiddleware.h"
 
-
-#define RX_USART_BUFFER 18U
 
 uint8_t usart_rxbuffer[RX_USART_BUFFER];
 
@@ -15,7 +20,8 @@ RC_Ctl_t RC_Ctl;
 static void DR16_process(volatile unsigned char rx_buffer[]);
 
 
-/* @brief:cInit
+/**
+ *@brief:		cInit
  * @param[in]:
  * @param[out]:
  */
@@ -25,7 +31,8 @@ uint8_t DR16_DataInit(void)
 	HAL_Delay(100);
 	return 0;
 }
-/* @brief:callback
+/**
+ *@brief:callback
  * @param[in]:
  * @param[out]:
  */
@@ -43,7 +50,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	}
 
 }
-/* @brief:处理函数
+/**
+ * @brief:处理函数
  * @param[in]:
  * @param[out]:
  */

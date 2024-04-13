@@ -1,7 +1,7 @@
 #ifndef MOTORS_MIDDLEWARE_H
 #define MOTORS_MIDDLEWARE_H
 
-
+/*-------------------includes-------------------*/
 #include "struct_typedef.h"
 #include "can.h"
 
@@ -19,22 +19,24 @@
 #define CURRENT_DEVIED_100 0.01f
 
 
-/*DEFINE STRUCT ------------------------*/
+/*-------------------DEFINE STRUCT -------------------*/
 typedef struct
 {
-  fp32 angle_inst;					//角度返回值
-	int16_t speed_inst;					//实时速度
+	fp32 angle_inst;				//角度返回值
+	int16_t speed_inst;				//实时速度
 	int16_t cur_temp;				//电流
-	fp32 current_inst;			//实时电流
+	fp32 current_inst;				//实时电流
 	
 	fp32 last_angle;				//前一次角度返回值
-	int32_t cycle_cnt;					//圈数
-	fp32 real_posion;			//实际位置
+	int32_t cycle_cnt;				//圈数
+	fp32 real_speed;				//实际速度
+	fp32 real_posion;				//实际位置
 	
 }RMotor_t;
 
-
+/*-------------------FUNCTION -------------------*/
 void motor_can_filter_init(CAN_HandleTypeDef* hcan_1);
+void _Motor_ID_Cansend(int a, int b, int c, int d,int ID,CAN_HandleTypeDef *hcan);
 
 #endif
 
